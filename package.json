@@ -1,0 +1,23 @@
+{
+  "name": "jspm-bundler",
+  "version": "0.1.0",
+  "description": "more configurable bundler for jspm",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/crstffr/jspm-bundler.git"
+  },
+  "keywords": [
+    "jspm",
+    "bundle"
+  ],
+  "author": "crstffr",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/crstffr/jspm-bundler/issues"
+  },
+  "homepage": "https://github.com/crstffr/jspm-bundler#readme"
+}
