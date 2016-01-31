@@ -27,6 +27,7 @@ function JSPMBundler(opts) {
             minify: false,
             mangle: false,
             sourceMaps: false,
+            lowResSourceMaps: true
         }
     });
 
@@ -124,7 +125,7 @@ function JSPMBundler(opts) {
 
         });
 
-        _removeFromBundleManifest(unbundles);
+        return _removeFromBundleManifest(unbundles);
 
     }
 
@@ -140,6 +141,7 @@ function JSPMBundler(opts) {
         var opts = _bundles[name];
         if (opts) {
             opts.builder = _.defaults(opts.builder, _opts.builder);
+            console.log(name ,opts);
             return opts;
         } else {
             return false;
@@ -327,7 +329,7 @@ function JSPMBundler(opts) {
             }
         });
 
-        _writeBundleManifest(manifest);
+        return _writeBundleManifest(manifest);
 
     }
 
@@ -348,7 +350,7 @@ function JSPMBundler(opts) {
             delete manifest.chksums[bundle.path];
         });
 
-        _writeBundleManifest(manifest);
+        return _writeBundleManifest(manifest);
 
     }
 
@@ -380,6 +382,8 @@ function JSPMBundler(opts) {
         fs.writeFileSync(_getBundleManifestPath(), output);
 
         console.log(' ✔ Manifest updated');
+
+        return new Promise.resolve();
 
     }
 
