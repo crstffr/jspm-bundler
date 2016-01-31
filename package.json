@@ -1,6 +1,6 @@
 {
   "name": "jspm-bundler",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "more configurable bundler for jspm",
   "main": "bundler.js",
   "scripts": {
