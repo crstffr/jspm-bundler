@@ -18,17 +18,24 @@ module.exports = JSPMBundler;
 
 function JSPMBundler(opts) {
 
+    opts = opts || {};
+
     var _this = this;
+
     var _bundles = {};
+
     var _system = {
-        baseURL: path.join(root, opts.baseURL, '/') || root
+        config: {},
+        baseURL: ''
     };
 
+    _system.baseURL = path.join(root, opts.baseURL, '/') || root;
     _system.config = _getSystemJSConfig();
 
     var _opts = _.defaults(opts || {}, {
-        bundleDest: 'bundles/',
-        bundleFile: 'bundles.js',
+        dest: 'bundles/',
+        file: 'bundles.js',
+        bundles: {},
         builder: {
             minify: false,
             mangle: false,
@@ -36,6 +43,8 @@ function JSPMBundler(opts) {
             lowResSourceMaps: true
         }
     });
+
+    _bundles = _opts.bundles;
 
     /**
      * Set the bundle configuration map.
@@ -99,8 +108,7 @@ function JSPMBundler(opts) {
 
         if (!groups) {
             console.log('Removing all bundles...');
-            _writeBundleManifest(null);
-            return;
+            return _writeBundleManifest(null);
         }
 
         groups = (groups) ? groups : _.keys(_bundles);
@@ -162,7 +170,7 @@ function JSPMBundler(opts) {
      * @private
      */
     function _getBundleDest(bundleName, bundleOpts) {
-        var url = path.join(_system.baseURL, opts.bundleDest);
+        var url = path.join(_system.baseURL, opts.dest);
         var min = bundleOpts.builder.minify;
         var file = bundleName + ((min) ? '.min.js' : '.js');
 
@@ -297,7 +305,7 @@ function JSPMBundler(opts) {
      */
     function _getBundleManifestPath() {
         var url = _system.baseURL;
-        return String(path.join(url, _opts.bundleFile));
+        return String(path.join(url, _opts.file));
     }
 
     /**
@@ -310,7 +318,7 @@ function JSPMBundler(opts) {
         try {
             data = require(path);
         } catch (e) {
-            console.log(e);
+            console.log('Manifest not found, creating one.');
             data = {};
         }
         return data;
@@ -370,7 +378,7 @@ function JSPMBundler(opts) {
      */
     function _writeBundleManifest(manifest) {
 
-        console.log('Updating manifest...');
+        console.log('Writing manifest...');
 
         var fs = require('fs');
         var output = '';
@@ -390,7 +398,7 @@ function JSPMBundler(opts) {
 
         fs.writeFileSync(_getBundleManifestPath(), output);
 
-        console.log(' ✔ Manifest updated');
+        console.log(' ✔ Manifest written');
 
         return Promise.resolve();
 
