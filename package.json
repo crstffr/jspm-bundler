@@ -2,7 +2,7 @@
   "name": "jspm-bundler",
   "version": "0.1.0",
   "description": "more configurable bundler for jspm",
-  "main": "index.js",
+  "main": "bundler.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -19,5 +19,12 @@
   "bugs": {
     "url": "https://github.com/crstffr/jspm-bundler/issues"
   },
-  "homepage": "https://github.com/crstffr/jspm-bundler#readme"
+  "homepage": "https://github.com/crstffr/jspm-bundler#readme",
+  "dependencies": {
+    "async": "^1.5.2",
+    "checksum": "^0.1.1",
+    "jspm": "^0.16.25",
+    "lodash": "^4.1.0",
+    "mkdirp": "^0.5.1"
+  }
 }
