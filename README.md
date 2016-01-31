@@ -32,6 +32,10 @@ var Bundler = require('jspm-bundler);
 var bundler = new Bundler({
     bundleDest: './bundles/',
     bundleFile: './bundles.js',
+    builder: {
+        minify: true,
+        mangle: true
+    }
 });
 ```
 
@@ -114,6 +118,12 @@ var bundler = new Bundler({
 
     bundleDest: '', // path to folder where bundles are saved
     bundleFile: '', // JS file where bundle config is written
+
+    builder: {      // global build options passed to jspm.Builder
+        minify: false,
+        mangle: false,
+        sourceMaps: false
+    }
 });
 ```
 
@@ -129,7 +139,7 @@ bundler.bundles({
         items: [],          // list of packages or files to bundle,
 
         builder: {          // options passed to jspm.Builder
-            minify: false,
+            minify: false,  // these override the global options
             mangle: false,
             sourceMaps: false,
             // etc ...
