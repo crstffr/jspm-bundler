@@ -1,3 +1,15 @@
+## v0.1.2
+
+Bugs and tweaks.
+
+* Bundle config map can be passed in on instantiation.
+* Fixed bug with unbundle() not returning promise.
+
+Config options changed:
+
+* bundleDest -> dest
+* bundleFile -> file
+
 ## v0.1.1
 
 Bug fixes.

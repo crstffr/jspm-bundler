@@ -1,8 +1,8 @@
 # jspm-bundler
 
-A more configurable bundler for JSPM.  Saves bundle configuration to an external JS file
-(instead of your config.js) so that it can be easily excluded from git repos and updated
-independently of the config.js.
+A configurable bundler for JSPM. Saves bundle manifest to an external JS file
+(instead of your config.js) so that it can be easily excluded from git repos
+and updated independently of the config.js.
 
 * Easier management of exclusions (exclude groups or packages)
 * Bundle/unbundle specific groups
@@ -19,9 +19,9 @@ npm install jspm-bundler --save-dev
 In your HTML
 
 ```html
-<script src="./jspm_packages/system.js"></script> <!-- SystemJS -->
-<script src="./config.js"></script> <!-- your SystemJS config -->
-<script src="./bundles.js"></script> <!-- your bundleFile -->
+<script src="jspm_packages/system.js"></script> <!-- SystemJS -->
+<script src="config.js"></script> <!-- your SystemJS config -->
+<script src="bundles.js"></script> <!-- your bundleFile -->
 ```
 
 In gulpfile or other Node build script.
@@ -31,50 +31,46 @@ var Bundler = require('jspm-bundler');
 
 var bundler = new Bundler({
     baseURL: 'app/static/',
-    bundleDest: './bundles/',
-    bundleFile: './bundles.js',
+    dest: 'bundles/',
+    file: 'bundles.js',
     builder: {
         minify: true,
-        mangle: true
-    }
-});
-```
-
-Load your bundle configuration
-
-```javascript
-bundler.bundles({
-    cdn: {
-        bundle: false,
-        items: [
-            'angular',
-            'lodash',
-            'jquery'
-        ]
+        mangle: true,
+        sourceMaps: false
     },
-    deps: {
-        combine: true,
-        exclude: ['cdn'],
-        items: [
-            'angular-foundation',
-            'angular-ui-router',
-            'angular-sanitize',
-            'angular-cookie',
-            'ui-router-extras',
-        ]
-    },
-    app: {
-        exclude: ['cdn', 'deps'],
-        items: ['app/app']
-    },
-    routes: {
-        exclude: ['cdn', 'deps', 'app'],
-        items: [
-            'routes/index.route',
-            'routes/users/users.route',
-            'routes/orders/orders.route',
-            'routes/products/products.route'
-        ]
+    bundles: {
+        cdn: {
+            bundle: false,
+            items: [
+                'angular',
+                'lodash',
+                'jquery'
+            ]
+        },
+        deps: {
+            combine: true,
+            exclude: ['cdn'],
+            items: [
+                'angular-foundation',
+                'angular-ui-router',
+                'angular-sanitize',
+                'angular-cookie',
+                'ui-router-extras',
+            ]
+        },
+        app: {
+            exclude: ['cdn', 'deps'],
+            items: ['app/app']
+        },
+        routes: {
+            exclude: ['cdn', 'deps', 'app'],
+            items: [
+                'app/routes/index.route',
+                'app/routes/users/users.route',
+                'app/routes/orders/orders.route',
+                'app/routes/products/products.route'
+            ]
+        }
     }
 });
 ```
@@ -119,33 +115,29 @@ var bundler = new Bundler({
 
     // both of these paths are relative to your baseURL.
 
-    bundleDest: '', // path to folder where bundles are saved
-    bundleFile: '', // JS file where bundle config is written
+    dest: '', // path to folder where bundles are saved
+    file: '', // JS file where bundle config is written
 
     builder: {      // global build options passed to jspm.Builder
         minify: false,
         mangle: false,
         sourceMaps: false
-    }
-});
-```
+        // etc ...
+    },
 
+    bundles: {
+        groupName: {            // group name whatever you want
+            bundle: true,       // whether to bundle this group
+            combine: false,     // combine items together via addition
+            exclude: []         // exclude groups or packages via subtraction
+            items: [],          // list of packages or files to bundle,
 
-## Bundle Group Config
-
-```javascript
-bundler.bundles({
-    groupName: {
-        bundle: true,       // whether to bundle this group
-        combine: false,     // combine items together via addition
-        exclude: []         // exclude groups or packages via subtraction
-        items: [],          // list of packages or files to bundle,
-
-        builder: {          // options passed to jspm.Builder
-            minify: false,  // these override the global options
-            mangle: false,
-            sourceMaps: false,
-            // etc ...
+            builder: {          // options passed to jspm.Builder
+                minify: false,  // these override the global options
+                mangle: false,
+                sourceMaps: false
+                // etc ...
+            }
         }
     }
 });
