@@ -27,7 +27,7 @@ In your HTML
 In gulpfile or other Node build script.
 
 ```javascript
-var Bundler = require('jspm-bundler);
+var Bundler = require('jspm-bundler');
 
 var bundler = new Bundler({
     bundleDest: './bundles/',
