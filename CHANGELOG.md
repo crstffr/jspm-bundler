@@ -1,3 +1,10 @@
+## v0.1.1
+
+Bug fixes.
+
+* Works inside gulp tasks
+* Added ```baseURL``` bundler config option
+
 ## v0.1.0
 
 Initial release.

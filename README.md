@@ -30,6 +30,7 @@ In gulpfile or other Node build script.
 var Bundler = require('jspm-bundler');
 
 var bundler = new Bundler({
+    baseURL: 'app/static/',
     bundleDest: './bundles/',
     bundleFile: './bundles.js',
     builder: {
@@ -114,7 +115,9 @@ bundler.unbundle(['routes']).then(function(){
 ```javascript
 var bundler = new Bundler({
 
-    // both of these paths are relative to your SystemJS baseURL.
+    baseURL: '',     // must be the same baseURL as SystemJS
+
+    // both of these paths are relative to your baseURL.
 
     bundleDest: '', // path to folder where bundles are saved
     bundleFile: '', // JS file where bundle config is written
