@@ -5,20 +5,26 @@ var async = require('async');
 var mkdirp = require('mkdirp');
 var chksum = require('checksum');
 var Builder = require('jspm').Builder;
-var root = path.dirname(require.main.filename) + '/';
+var root = path.dirname(module.parent.filename) + '/';
+
+/*
+console.log('root', root);
+console.log('__dirname', __dirname);
+console.log('__filename', __filename);
+console.log('module.parent', module.parent);
+*/
 
 module.exports = JSPMBundler;
 
 function JSPMBundler(opts) {
 
     var _this = this;
-
     var _bundles = {};
-
     var _system = {
-        baseURL: _getJSPMBaseURL(),
-        config: _getSystemJSConfig()
+        baseURL: path.join(root, opts.baseURL, '/') || root
     };
+
+    _system.config = _getSystemJSConfig();
 
     var _opts = _.defaults(opts || {}, {
         bundleDest: 'bundles/',
@@ -37,7 +43,7 @@ function JSPMBundler(opts) {
      * @param {Object} bundleConfig
      * @returns {JSPMBundler}
      */
-    this.bundles = function(bundleConfig) {
+    this.bundles = function (bundleConfig) {
         _bundles = bundleConfig;
         return _this;
     }
@@ -52,7 +58,7 @@ function JSPMBundler(opts) {
      * @param {Array} groups
      * @returns {Promise}
      */
-    this.bundle = function(groups) {
+    this.bundle = function (groups) {
 
         if (_.isEmpty(_bundles)) {
             throw new Error('Cant bundle until bundles are defined');
@@ -66,17 +72,17 @@ function JSPMBundler(opts) {
         groups = (_.isArray(groups)) ? groups : [groups];
 
         _.forEach(groups, function (groupName) {
-            promises.push(async.asyncify(function(){
-                return _bundleGroup(groupName).then(function(bundles){
+            promises.push(async.asyncify(function () {
+                return _bundleGroup(groupName).then(function (bundles) {
                     completed = completed.concat(bundles);
                 });
             }));
         });
 
-        return new Promise(function(resolve){
+        return new Promise(function (resolve) {
             async.series(promises, resolve);
-        }).then(function(){
-            return _calcChecksums(completed).then(function(checksums){
+        }).then(function () {
+            return _calcChecksums(completed).then(function (checksums) {
                 _updateBundleManifest(completed, checksums);
                 console.log('-- Complete -------------');
             });
@@ -87,7 +93,7 @@ function JSPMBundler(opts) {
      *
      * @param {Array} groups
      */
-    this.unbundle = function(groups) {
+    this.unbundle = function (groups) {
 
         console.log('-- Unbundling -----------');
 
@@ -103,7 +109,7 @@ function JSPMBundler(opts) {
         var unbundles = [];
         var shortPath = '';
 
-        _.forEach(groups, function(groupName){
+        _.forEach(groups, function (groupName) {
 
             var bundleOpts = _getBundleOpts(groupName);
 
@@ -115,7 +121,7 @@ function JSPMBundler(opts) {
 
             } else {
 
-                _.forEach(bundleOpts.items, function(item) {
+                _.forEach(bundleOpts.items, function (item) {
                     shortPath = _getBundleShortPath(item, bundleOpts);
                     unbundles.push({path: shortPath});
                     console.log(' ✔ Removed:', shortPath);
@@ -141,7 +147,6 @@ function JSPMBundler(opts) {
         var opts = _bundles[name];
         if (opts) {
             opts.builder = _.defaults(opts.builder, _opts.builder);
-            console.log(name ,opts);
             return opts;
         } else {
             return false;
@@ -157,7 +162,7 @@ function JSPMBundler(opts) {
      * @private
      */
     function _getBundleDest(bundleName, bundleOpts) {
-        var url = _system.baseURL + opts.bundleDest;
+        var url = path.join(_system.baseURL, opts.bundleDest);
         var min = bundleOpts.builder.minify;
         var file = bundleName + ((min) ? '.min.js' : '.js');
 
@@ -178,31 +183,31 @@ function JSPMBundler(opts) {
      */
     function _getBundleShortPath(bundleName, bundleOpts) {
         var fullPath = _getBundleDest(bundleName, bundleOpts);
-        return fullPath.replace(_getJSPMBaseURL(), '');
+        return fullPath.replace(_system.baseURL, '');
 
     }
 
     /**
      *
-     * @param {String} name
+     * @param {String} bundleName
      * @returns {Promise}
      * @private
      */
-    function _bundleGroup(name) {
+    function _bundleGroup(bundleName) {
 
-        var bundleOpts = _getBundleOpts(name);
+        var bundleOpts = _getBundleOpts(bundleName);
 
         if (!bundleOpts) {
 
-            return Promise.reject('Unable to find group: ' + name);
+            return Promise.reject('Unable to find group: ' + bundleName);
 
         } else if (bundleOpts.bundle === false) {
 
-            return Promise.resolve('Skipping: ' + name);
+            return Promise.resolve('Skipping: ' + bundleName);
 
         }
 
-        console.log('Bundling group:', name, '...');
+        console.log('Bundling group:', bundleName, '...');
 
         var promises = [];
         var completed = [];
@@ -218,11 +223,11 @@ function JSPMBundler(opts) {
 
             // Combine all the items in the group and bundle together.
 
-            bundleDest = _getBundleDest(name, bundleOpts);
+            bundleDest = _getBundleDest(bundleName, bundleOpts);
             bundleStr = bundleItems.join(' + ') + minusStr;
-            promises.push(async.asyncify(function() {
-                return _bundle(bundleStr, bundleDest, bundleOpts).then(function(bundle){
-                    console.log(' ✔ Bundled:', name);
+            promises.push(async.asyncify(function () {
+                return _bundle(bundleName, bundleStr, bundleDest, bundleOpts).then(function (bundle) {
+                    console.log(' ✔ Bundled:', bundleName);
                     completed.push(bundle);
                     return bundle;
                 });
@@ -234,12 +239,12 @@ function JSPMBundler(opts) {
 
             _.forEach(bundleItems, function (itemName) {
 
-                promises.push(async.asyncify(function() {
+                promises.push(async.asyncify(function () {
 
                     bundleStr = itemName + minusStr;
                     bundleDest = _getBundleDest(itemName, bundleOpts);
 
-                    return _bundle(bundleStr, bundleDest, bundleOpts).then(function(bundle){
+                    return _bundle(itemName, bundleStr, bundleDest, bundleOpts).then(function (bundle) {
                         console.log(' ✔ Bundled:', itemName);
                         completed.push(bundle);
                         return bundle;
@@ -248,8 +253,8 @@ function JSPMBundler(opts) {
             });
         }
 
-        return new Promise(function(resolve) {
-            async.series(promises, function() {
+        return new Promise(function (resolve) {
+            async.series(promises, function () {
                 resolve(completed);
             });
         });
@@ -264,21 +269,20 @@ function JSPMBundler(opts) {
      * @returns {Promise}
      * @private
      */
-    function _bundle(bundleStr, bundleDest, bundleOpts) {
+    function _bundle(bundleName, bundleStr, bundleDest, bundleOpts) {
 
         var builder = new Builder({separateCSS: false});
-        var shortPath = bundleDest.replace(_system.baseURL, '');
         var builderOpts = bundleOpts.builder;
 
         mkdirp.sync(path.dirname(bundleDest));
 
-        return new Promise(function(resolve) {
+        return new Promise(function (resolve) {
             builder.bundle(bundleStr, bundleDest, builderOpts).catch(function (err) {
                 console.log('Build Error', err);
                 resolve(err);
-            }).then(function(output){
+            }).then(function (output) {
                 resolve({
-                    path: shortPath,
+                    path: _getBundleShortPath(bundleName, bundleOpts),
                     modules: output.modules
                 });
             });
@@ -292,7 +296,7 @@ function JSPMBundler(opts) {
      * @private
      */
     function _getBundleManifestPath() {
-        var url = _getJSPMBaseURL();
+        var url = _system.baseURL;
         return String(path.join(url, _opts.bundleFile));
     }
 
@@ -303,7 +307,12 @@ function JSPMBundler(opts) {
      */
     function _getBundleManifest() {
         var data, path = _getBundleManifestPath();
-        try { data = require(path); } catch(e) { console.log(e); data = {}; }
+        try {
+            data = require(path);
+        } catch (e) {
+            console.log(e);
+            data = {};
+        }
         return data;
     }
 
@@ -322,7 +331,7 @@ function JSPMBundler(opts) {
             chksums: {}
         });
 
-        _.forEach(bundles, function(bundle) {
+        _.forEach(bundles, function (bundle) {
             if (bundle.path) {
                 manifest.bundles[bundle.path] = bundle.modules;
                 manifest.chksums[bundle.path] = chksums[bundle.path] || '';
@@ -345,7 +354,7 @@ function JSPMBundler(opts) {
             chksums: {}
         });
 
-        _.forEach(bundles, function(bundle) {
+        _.forEach(bundles, function (bundle) {
             delete manifest.bundles[bundle.path];
             delete manifest.chksums[bundle.path];
         });
@@ -383,11 +392,9 @@ function JSPMBundler(opts) {
 
         console.log(' ✔ Manifest updated');
 
-        return new Promise.resolve();
+        return Promise.resolve();
 
     }
-
-
 
 
     /**
@@ -404,16 +411,20 @@ function JSPMBundler(opts) {
 
         console.log('Calculating checksums...');
 
-        _.forEach(bundles, function(bundle){
+        _.forEach(bundles, function (bundle) {
 
-            if (!_.isObject(bundle)) { return; }
+            if (!_.isObject(bundle)) {
+                return;
+            }
 
-            promises.push(async.asyncify(function() {
-                return new Promise(function(resolve){
-                    filepath = path.join(_getJSPMBaseURL(), bundle.path);
+            promises.push(async.asyncify(function () {
+                return new Promise(function (resolve) {
+                    filepath = path.join(_system.baseURL, bundle.path);
                     filename = path.parse(bundle.path).base;
-                    chksum.file(filepath, function(err, sum){
-                        if (err) { console.log(' Error:', err); }
+                    chksum.file(filepath, function (err, sum) {
+                        if (err) {
+                            console.log(' Checksum Error:', err);
+                        }
                         console.log(' ✔', filename, sum);
                         chksums[bundle.path] = sum;
                         resolve(sum);
@@ -422,73 +433,100 @@ function JSPMBundler(opts) {
             }));
         });
 
-        return new Promise(function(resolve) {
-            async.waterfall(promises, function() {
+        return new Promise(function (resolve) {
+            async.waterfall(promises, function () {
                 resolve(chksums);
             });
         });
     }
 
+
+    /**
+     * Load JSPM and the user's config.js to get the map
+     * @returns {System.config}
+     * @private
+     */
+    function _getSystemJSConfig() {
+        var jspm = require('jspm');
+        var file = path.join(_system.baseURL, 'config.js');
+        require(file);
+        return System.config;
+    }
+
+
+    /**
+     *
+     * @param {Array|Object} exclude
+     * @param {Object} groups
+     * @returns {String}
+     * @private
+     */
+    function _exclusionString(exclude, groups) {
+        var str = _exclusionArray(exclude, groups).join(' - ');
+        return (str) ? ' - ' + str : '';
+    }
+
+    /**
+     *
+     * @param {Array|Object} exclude
+     * @param {Object} groups
+     * @returns {Array}
+     * @private
+     */
+    function _exclusionArray(exclude, groups) {
+        var minus = [];
+        exclude = (_.isArray(exclude)) ? exclude : _.keys(exclude);
+        _.forEach(exclude, function (item) {
+            var group = groups[item];
+            if (group) {
+                // exclude everything from this group
+                minus = minus.concat(_exclusionArray(group.items, groups));
+            } else {
+                // exclude this item by name
+                minus.push(item);
+            }
+        });
+        return minus;
+    }
+
 }
 
 
-/**
- * Load JSPM and the user's config.js to get the map
- * @returns {System.config}
- * @private
+/*
+ // Carry over from gulpfile. Needs to be integrated
+
+ function _getBundleInfo(entryPoint) {
+
+ require(_paths.config.system); // loads System.config();
+ var map = System.map; // populated from System.config();
+ var package = map[entryPoint];
+
+ var out = {
+ pathname: '',
+ packname: ''
+ };
+
+ if (package) {
+
+ var version = package.split('@')[1];
+ out.packname = entryPoint + '@' + version;
+ out.pathname = 'libs/' + out.packname;
+
+ } else {
+
+ var parts = entryPoint.split('/');
+ out.packname = _.last(parts);
+ out.pathname = _.initial(parts).join('/');
+
+ }
+
+ out.relpath = 'bundle/' + out.pathname + '/';
+ out.abspath = _paths.static + out.relpath;
+ out.destname = out.packname + '.min.js';
+ out.dest = out.abspath + out.destname;
+
+ return out;
+
+ }
+
  */
-function _getSystemJSConfig() {
-    var jspm = require('jspm');
-    var url = _getJSPMBaseURL();
-    var file = url + 'config.js';
-    require(file);
-    return System.config;
-}
-
-/**
- *
- * @returns {String}
- * @private
- */
-function _getJSPMBaseURL() {
-    var pjson = require(root + '/package.json');
-    var url = _.get(pjson, 'jspm.directories.baseURL') || '.';
-    return root + ((url.substr(-1) == '/') ? url : url + '/');
-}
-
-
-
-/**
- *
- * @param {Array|Object} exclude
- * @param {Object} groups
- * @returns {String}
- * @private
- */
-function _exclusionString(exclude, groups) {
-    var str = _exclusionArray(exclude, groups).join(' - ');
-    return (str) ? ' - ' + str : '';
-}
-
-/**
- *
- * @param {Array|Object} exclude
- * @param {Object} groups
- * @returns {Array}
- * @private
- */
-function _exclusionArray(exclude, groups) {
-    var minus = [];
-    exclude = (_.isArray(exclude)) ? exclude : _.keys(exclude);
-    _.forEach(exclude, function (item) {
-        var group = groups[item];
-        if (group) {
-            // exclude everything from this group
-            minus = minus.concat(_exclusionArray(group.items, groups));
-        } else {
-            // exclude this item by name
-            minus.push(item);
-        }
-    });
-    return minus;
-}
