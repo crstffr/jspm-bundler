@@ -26,7 +26,7 @@ In your HTML
 
 In gulpfile or other Node build script.
 
-```
+```javascript
 var Bundler = require('jspm-bundler);
 
 var bundler = new Bundler({
@@ -41,7 +41,7 @@ var bundler = new Bundler({
 
 Load your bundle configuration
 
-```
+```javascript
 bundler.bundles({
     cdn: {
         bundle: false,
@@ -80,7 +80,7 @@ bundler.bundles({
 
 Bundle all groups in your bundle configuration
 
-```
+```javascript
 bundler.bundle().then(function(){
     console.log('bundled all groups');
 });
@@ -88,7 +88,7 @@ bundler.bundle().then(function(){
 
 Bundle just specific groups
 
-```
+```javascript
 bundler.bundle(['app','routes']).then(function(){
     console.log('bundled just the app and routes');
 });
@@ -96,14 +96,14 @@ bundler.bundle(['app','routes']).then(function(){
 
 Remove entire bundle config
 
-```
+```javascript
 bundler.unbundle().then(function(){
     console.log('all bundle configuration removed');
 });
 ```
 
 Remove individual bundle configs
-```
+```javascript
 bundler.unbundle(['routes']).then(function(){
     console.log('bundle configuration removed for just routes');
 });
@@ -111,7 +111,7 @@ bundler.unbundle(['routes']).then(function(){
 
 ## Bundler Config
 
-```
+```javascript
 var bundler = new Bundler({
 
     // both of these paths are relative to your SystemJS baseURL.
@@ -130,7 +130,7 @@ var bundler = new Bundler({
 
 ## Bundle Group Config
 
-```
+```javascript
 bundler.bundles({
     groupName: {
         bundle: true,       // whether to bundle this group
