@@ -121,7 +121,7 @@ var bundler = new Bundler({
 
     // both of these paths are relative to your baseURL.
     dest: '',       // path to folder where bundles are saved
-    file: '',       // JS file where bundle config is written
+    file: '',       // JS file where bundle manifest is written
 
     bust: false,    // use file checksums to bust cached bundles
 
