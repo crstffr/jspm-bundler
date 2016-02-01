@@ -4,7 +4,6 @@ Added cache busting using generated checksums.
 
 * Inject custom System.normalize and System.locate loaders.
 * Unbundling all groups empties bundle manifest completely.
-*
 
 Config option added:
 

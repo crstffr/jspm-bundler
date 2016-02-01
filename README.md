@@ -120,9 +120,8 @@ var bundler = new Bundler({
     baseURL: '',     // must be the same baseURL as SystemJS
 
     // both of these paths are relative to your baseURL.
-
-    dest: '', // path to folder where bundles are saved
-    file: '', // JS file where bundle config is written
+    dest: '',       // path to folder where bundles are saved
+    file: '',       // JS file where bundle config is written
 
     bust: false,    // use file checksums to bust cached bundles
 
