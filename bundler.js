@@ -35,6 +35,7 @@ function JSPMBundler(opts) {
     var _opts = _.defaults(opts || {}, {
         dest: 'bundles/',
         file: 'bundles.js',
+        bustCache: false,
         bundles: {},
         builder: {
             minify: false,
@@ -382,19 +383,32 @@ function JSPMBundler(opts) {
 
         var fs = require('fs');
         var output = '';
+        var template = '';
+        var templateName = '';
+        var templatePath = '';
 
-        if (!manifest) {
-            manifest = {
-                bundles: {},
-                chksums: {}
-            };
+        if (manifest) {
+
+            try {
+
+                templateName = (_opts.bustCache) ? 'busted-manifest.tpl' : 'simple-manifest.tpl';
+                templatePath = path.join(__dirname, 'templates', templateName);
+                template = fs.readFileSync(templatePath, 'utf8');
+
+            } catch(e) {
+
+                console.log(' X Unable to open manifest template');
+                console.log(e);
+                return;
+
+            }
+
+            output = _.template(template)({
+                chksums: JSON.stringify(manifest.chksums, null, '    '),
+                bundles: JSON.stringify(manifest.bundles, null, '    '),
+            });
+
         }
-
-        output += '(function(module){\n';
-        output += '  var chksums = module.exports.chksums = ' + JSON.stringify(manifest.chksums, null, '\t') + ';\n';
-        output += '  var bundles = module.exports.bundles = ' + JSON.stringify(manifest.bundles, null, '\t') + ';\n';
-        output += '  System.config({bundles: bundles});\n';
-        output += '})((typeof module !== "undefined") ? module : {exports: {}});';
 
         fs.writeFileSync(_getBundleManifestPath(), output);
 
