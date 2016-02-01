@@ -1,3 +1,15 @@
+## v0.1.3
+
+Added cache busting using generated checksums.
+
+* Inject custom System.normalize and System.locate loaders.
+* Unbundling all groups empties bundle manifest completely.
+*
+
+Config option added:
+
+* bust: true|false
+
 ## v0.1.2
 
 Bugs and tweaks.

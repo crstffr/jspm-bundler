@@ -35,7 +35,7 @@ function JSPMBundler(opts) {
     var _opts = _.defaults(opts || {}, {
         dest: 'bundles/',
         file: 'bundles.js',
-        bustCache: false,
+        bust: false,
         bundles: {},
         builder: {
             minify: false,
@@ -391,7 +391,7 @@ function JSPMBundler(opts) {
 
             try {
 
-                templateName = (_opts.bustCache) ? 'busted-manifest.tpl' : 'simple-manifest.tpl';
+                templateName = (_opts.bust) ? 'busted-manifest.tpl' : 'simple-manifest.tpl';
                 templatePath = path.join(__dirname, 'templates', templateName);
                 template = fs.readFileSync(templatePath, 'utf8');
 

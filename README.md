@@ -4,8 +4,9 @@ A configurable bundler for JSPM. Saves bundle manifest to an external JS file
 (instead of your config.js) so that it can be easily excluded from git repos
 and updated independently of the config.js.
 
-* Easier management of exclusions (exclude groups or packages)
 * Bundle/unbundle specific groups
+* Easier management of exclusions (exclude groups or packages)
+* Bust cached bundles using generated file checksums
 
 
 ## Installation
@@ -30,14 +31,19 @@ In gulpfile or other Node build script.
 var Bundler = require('jspm-bundler');
 
 var bundler = new Bundler({
+
     baseURL: 'app/static/',
+
     dest: 'bundles/',
     file: 'bundles.js',
+    bust: true,
+
     builder: {
         minify: true,
         mangle: true,
         sourceMaps: false
     },
+
     bundles: {
         cdn: {
             bundle: false,
@@ -117,6 +123,8 @@ var bundler = new Bundler({
 
     dest: '', // path to folder where bundles are saved
     file: '', // JS file where bundle config is written
+
+    bust: false,    // use file checksums to bust cached bundles
 
     builder: {      // global build options passed to jspm.Builder
         minify: false,
