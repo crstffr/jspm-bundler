@@ -1,6 +1,8 @@
 var _ = require('lodash');
+var fs = require('fs');
 var path = require('path');
 var jspm = require('jspm');
+var zlib = require('zlib');
 var async = require('async');
 var mkdirp = require('mkdirp');
 var chksum = require('checksum');
@@ -36,6 +38,7 @@ function JSPMBundler(opts) {
         dest: 'bundles/',
         file: 'bundles.js',
         bust: false,
+        gzip: false,
         bundles: {},
         builder: {
             minify: false,
@@ -236,7 +239,6 @@ function JSPMBundler(opts) {
             bundleStr = bundleItems.join(' + ') + minusStr;
             promises.push(async.asyncify(function () {
                 return _bundle(bundleName, bundleStr, bundleDest, bundleOpts).then(function (bundle) {
-                    console.log(' ✔ Bundled:', bundleName);
                     completed.push(bundle);
                     return bundle;
                 });
@@ -254,7 +256,6 @@ function JSPMBundler(opts) {
                     bundleDest = _getBundleDest(itemName, bundleOpts);
 
                     return _bundle(itemName, bundleStr, bundleDest, bundleOpts).then(function (bundle) {
-                        console.log(' ✔ Bundled:', itemName);
                         completed.push(bundle);
                         return bundle;
                     });
@@ -281,21 +282,47 @@ function JSPMBundler(opts) {
     function _bundle(bundleName, bundleStr, bundleDest, bundleOpts) {
 
         var builder = new Builder({separateCSS: false});
-        var builderOpts = bundleOpts.builder;
+        var shortPath = _getBundleShortPath(bundleName, bundleOpts);
 
         mkdirp.sync(path.dirname(bundleDest));
 
         return new Promise(function (resolve) {
-            builder.bundle(bundleStr, bundleDest, builderOpts).catch(function (err) {
+
+            builder.bundle(bundleStr, bundleDest, bundleOpts.builder).catch(function (err) {
                 console.log('Build Error', err);
                 resolve(err);
             }).then(function (output) {
+
+                console.log(' ✔ Bundled:', bundleName);
+
+                if (_opts.gzip) {
+                    _gzip(bundleDest);
+                    shortPath += '.gz';
+                    console.log(' ✔ Gzipped:', bundleName);
+                }
+
                 resolve({
-                    path: _getBundleShortPath(bundleName, bundleOpts),
+                    path: shortPath,
                     modules: output.modules
                 });
+
             });
         });
+    }
+
+    /**
+     *
+     * @private
+     */
+    function _gzip(file) {
+        try {
+            var gzip = zlib.createGzip();
+            var inp = fs.createReadStream(file);
+            var out = fs.createWriteStream(file + '.gz');
+            inp.pipe(gzip).pipe(out);
+        } catch(e) {
+            console.log('Gzip Error:', e);
+        }
     }
 
 
@@ -381,7 +408,6 @@ function JSPMBundler(opts) {
 
         console.log('Writing manifest...');
 
-        var fs = require('fs');
         var output = '';
         var template = '';
         var templateName = '';

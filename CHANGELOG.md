@@ -1,3 +1,7 @@
+## v0.1.4
+
+Testing out gzip support, not documenting it in the readme yet.
+
 ## v0.1.3
 
 Added cache busting using generated checksums.
