@@ -8,6 +8,7 @@ and updated independently of the config.js.
 * Easier management of exclusions (exclude groups or packages)
 * Bust cached bundles using generated file checksums
 
+[![NPM](https://nodei.co/npm/jspm-bundler.png)](https://nodei.co/npm/jspm-bundler/)
 
 ## Installation
 
