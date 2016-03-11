@@ -35,7 +35,7 @@ var bundler = new Bundler({
 
     baseURL: '',     // must be the same baseURL as SystemJS
 
-    // both of these paths are relative to your baseURL.
+    // paths are relative to your baseURL.
     dest: '',       // path to folder where bundles are saved
     file: '',       // JS file where bundle manifest is written
 
@@ -98,3 +98,11 @@ bundler.unbundle(['routes']).then(function(){
     console.log('bundle configuration removed for just routes');
 });
 ```
+
+## Examples
+
+[Example Gulpfile](https://github.com/crstffr/jspm-bundler/blob/master/example/gulpfile.js)
+
+[Example Bundle Config](https://github.com/crstffr/jspm-bundler/blob/master/example/bundle.config.js)
+
+
