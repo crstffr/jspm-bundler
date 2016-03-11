@@ -33,50 +33,34 @@ var Bundler = require('jspm-bundler');
 
 var bundler = new Bundler({
 
-    baseURL: 'app/static/',
+    baseURL: '',     // must be the same baseURL as SystemJS
 
-    dest: 'bundles/',
-    file: 'bundles.js',
-    bust: true,
+    // both of these paths are relative to your baseURL.
+    dest: '',       // path to folder where bundles are saved
+    file: '',       // JS file where bundle manifest is written
 
-    builder: {
-        minify: true,
-        mangle: true,
+    bust: false,    // use file checksums to bust cached bundles
+
+    builder: {      // global build options passed to jspm.Builder
+        minify: false,
+        mangle: false,
         sourceMaps: false
+        // etc ...
     },
 
     bundles: {
-        cdn: {
-            bundle: false,
-            items: [
-                'angular',
-                'lodash',
-                'jquery'
-            ]
-        },
-        deps: {
-            combine: true,
-            exclude: ['cdn'],
-            items: [
-                'angular-foundation',
-                'angular-ui-router',
-                'angular-sanitize',
-                'angular-cookie',
-                'ui-router-extras',
-            ]
-        },
-        app: {
-            exclude: ['cdn', 'deps'],
-            items: ['app/app']
-        },
-        routes: {
-            exclude: ['cdn', 'deps', 'app'],
-            items: [
-                'app/routes/index.route',
-                'app/routes/users/users.route',
-                'app/routes/orders/orders.route',
-                'app/routes/products/products.route'
-            ]
+        groupName: {            // group name (whatever you want)
+            bundle: true,       // whether to bundle this group
+            combine: false,     // combine items together via addition
+            exclude: [],        // exclude groups or packages via subtraction
+            items: [],          // list of packages or files to bundle,
+
+            builder: {          // options passed to jspm.Builder
+                minify: false,  // these override the global options
+                mangle: false,
+                sourceMaps: false
+                // etc ...
+            }
         }
     }
 });
@@ -110,43 +94,5 @@ Remove individual bundle configs
 ```javascript
 bundler.unbundle(['routes']).then(function(){
     console.log('bundle configuration removed for just routes');
-});
-```
-
-## Bundler Config
-
-```javascript
-var bundler = new Bundler({
-
-    baseURL: '',     // must be the same baseURL as SystemJS
-
-    // both of these paths are relative to your baseURL.
-    dest: '',       // path to folder where bundles are saved
-    file: '',       // JS file where bundle manifest is written
-
-    bust: false,    // use file checksums to bust cached bundles
-
-    builder: {      // global build options passed to jspm.Builder
-        minify: false,
-        mangle: false,
-        sourceMaps: false
-        // etc ...
-    },
-
-    bundles: {
-        groupName: {            // group name whatever you want
-            bundle: true,       // whether to bundle this group
-            combine: false,     // combine items together via addition
-            exclude: []         // exclude groups or packages via subtraction
-            items: [],          // list of packages or files to bundle,
-
-            builder: {          // options passed to jspm.Builder
-                minify: false,  // these override the global options
-                mangle: false,
-                sourceMaps: false
-                // etc ...
-            }
-        }
-    }
 });
 ```

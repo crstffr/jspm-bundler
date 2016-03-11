@@ -1,3 +1,11 @@
+## v0.1.5
+
+* Test for valid destination filenames, error on invalid names. [#4](https://github.com/crstffr/jspm-bundler/issues/4)
+* Reject bundle() promise on various errors. [#5](https://github.com/crstffr/jspm-bundler/issues/5)
+* Allow separateCSS builder option. [#6](https://github.com/crstffr/jspm-bundler/issues/6)
+* Added example gulpfile and bundle.config.
+* Remove gzip support, didn't work out.
+
 ## v0.1.4
 
 Testing out gzip support, not documenting it in the readme yet.
