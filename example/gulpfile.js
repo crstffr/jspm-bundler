@@ -10,10 +10,12 @@ var config = require('./bundle.config');
  * gulp bundle -g core
  * gulp bundle -g modules
  */
-gulp.task('bundle', [], function () {
+gulp.task('bundle', function () {
     var options = minimist(process.argv.slice(2));
     var bundler = new Bundler(config);
-    return bundler.bundle(options.g);
+    return bundler.bundle(options.g).catch(function(e){
+        throw e; // This will cause gulp to error out.
+    });
 });
 
 /**
@@ -23,9 +25,10 @@ gulp.task('bundle', [], function () {
  * gulp unbundle -g core
  * gulp unbundle -g modules
  */
-gulp.task('unbundle', [], function () {
-    var minimist = require('minimist');
+gulp.task('unbundle', function () {
     var options = minimist(process.argv.slice(2));
     var bundler = new Bundler(config);
-    return bundler.unbundle(options.g);
+    return bundler.unbundle(options.g).catch(function(e){
+        throw e; // This will cause gulp to error out.
+    });
 });

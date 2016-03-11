@@ -44,8 +44,9 @@ var bundler = new Bundler({
     builder: {      // global build options passed to jspm.Builder
         minify: false,
         mangle: false,
-        sourceMaps: false
-        // etc ...
+        sourceMaps: false,
+        separateCSS: false,
+        lowResSourceMaps: true
     },
 
     bundles: {
@@ -58,8 +59,9 @@ var bundler = new Bundler({
             builder: {          // options passed to jspm.Builder
                 minify: false,  // these override the global options
                 mangle: false,
-                sourceMaps: false
-                // etc ...
+                sourceMaps: false,
+                separateCSS: false,
+                lowResSourceMaps: true
             }
         }
     }
