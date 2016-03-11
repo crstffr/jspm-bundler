@@ -13,8 +13,8 @@ var config = require('./bundle.config');
 gulp.task('bundle', function () {
     var options = minimist(process.argv.slice(2));
     var bundler = new Bundler(config);
-    return bundler.bundle(options.g).catch(function(e){
-        throw e; // This will cause gulp to error out.
+    return bundler.bundle(options.g).catch(function (e) {
+        throw e; // error out of gulp if there's a bundle problem
     });
 });
 
@@ -28,7 +28,7 @@ gulp.task('bundle', function () {
 gulp.task('unbundle', function () {
     var options = minimist(process.argv.slice(2));
     var bundler = new Bundler(config);
-    return bundler.unbundle(options.g).catch(function(e){
-        throw e; // This will cause gulp to error out.
+    return bundler.unbundle(options.g).catch(function (e) {
+        throw e; // error out of gulp if there's a bundle problem
     });
 });
