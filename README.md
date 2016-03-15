@@ -41,7 +41,7 @@ var bundler = new Bundler({
     file: 'bundles.js',         // JS file where bundle manifest is written.
 
     bust: false,                // Use file checksums to bust cached bundles,
-                                // does not work on SFX builds.
+                                // does not work on self-extracting builds.
 
     builder: {                  // Global build options passed to jspm.Builder.
 
