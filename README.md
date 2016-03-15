@@ -34,21 +34,25 @@ var Bundler = require('jspm-bundler');
 
 var bundler = new Bundler({
 
-    baseURL: '',                // must be the same baseURL as SystemJS
-                                // paths are relative to your baseURL
-    dest: '',                   // path to folder where bundles are saved
-    file: '',                   // JS file where bundle manifest is written
+    baseURL: '.',               // Must be the same baseURL as SystemJS.
 
-    bust: false,                // use file checksums to bust cached bundles
+    // Paths are relative to your baseURL.
+    dest: 'bundles',            // Path to folder where bundles are saved.
+    file: 'bundles.js',         // JS file where bundle manifest is written.
 
-    builder: {                  // global build options passed to jspm.Builder
-        sfx: false,             // self-extracting bundle with buildStatic()
+    bust: false,                // Use file checksums to bust cached bundles,
+                                // does not work on SFX builds.
+
+    builder: {                  // Global build options passed to jspm.Builder.
+
+        sfx: false,             // Self-extracting bundle with buildStatic().
         minify: false,
         mangle: false,
         sourceMaps: false,
         separateCSS: false,
         lowResSourceMaps: true,
-        config: {               // config file overrides
+
+        config: {               // Config file overrides.
             map: {},
             meta: {},
             paths: {}
@@ -57,10 +61,11 @@ var bundler = new Bundler({
     },
 
     bundles: {
-        groupName: {            // group name (whatever you want)
-            bundle: true,       // whether to bundle this group
-            combine: false,     // combine items together via addition
-            exclude: [],        // exclude groups or packages via subtraction
+        groupName: {            // Group name (whatever you want).
+
+            bundle: true,       // Whether to bundle this group.
+            combine: false,     // Combine items together via addition.
+            exclude: [],        // Exclude groups or packages via subtraction.
 
             // Items can be a simple array of packages and/or application files.
             // Globs or wildcards are not supported.  Bundles are created by
@@ -78,10 +83,10 @@ var bundler = new Bundler({
 
             items: {
                 'source/app': 'distbundle'
-            }
+            },
 
-            builder: {          // options passed to jspm.Builder
-                sfx: false,     // these override the global options
+            builder: {          // Options override the global builder options.
+                sfx: false,
                 minify: false,
                 mangle: false,
                 sourceMaps: false,
