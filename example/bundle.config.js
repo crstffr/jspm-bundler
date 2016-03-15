@@ -2,7 +2,7 @@ module.exports = {
 
     baseURL: '.',
     dest: 'dist',
-    file: 'bundle.manifest.js',
+    file: 'bundles.js',
     bust: true,
 
     builder: {
