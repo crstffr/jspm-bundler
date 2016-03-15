@@ -1,3 +1,10 @@
+## v0.1.6
+
+* Option to specify output filename for each item separately. [#7](https://github.com/crstffr/jspm-bundler/issues/7)
+* Option ```sfx``` for building self-extracting bundles. [#8](https://github.com/crstffr/jspm-bundler/issues/8)
+* Fix issue with absolute baseURL paths not resolving correctly. [#9](https://github.com/crstffr/jspm-bundler/issues/9)
+* Option ```builder.config``` for overriding system config.js. [#10](https://github.com/crstffr/jspm-bundler/issues/10)
+
 ## v0.1.5
 
 * Test for valid destination filenames, error on invalid names. [#4](https://github.com/crstffr/jspm-bundler/issues/4)

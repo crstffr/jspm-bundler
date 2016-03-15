@@ -2,8 +2,8 @@ module.exports = {
 
     baseURL: '.',
     dest: 'dist',
-    file: 'bundle.js',
-    bust: false,
+    file: 'bundle.manifest.js',
+    bust: true,
 
     builder: {
         minify: true,
@@ -15,8 +15,11 @@ module.exports = {
 
     bundles: {
         libs: {
-            bundle: false,
-            items: ['jquery', 'angular', 'lodash']
+            items: [
+                'jquery',
+                'angular',
+                'lodash'
+            ]
         },
         core: {
             exclude: ['libs'],
@@ -24,10 +27,10 @@ module.exports = {
         },
         modules: {
             exclude: ['libs', 'core'],
-            items: [
-                'core/modules/users',
-                'core/modules/items'
-            ]
+            items: {
+                'core/modules/users': 'user.module',        // outputs: dist/user.module.min.js
+                'core/modules/items': 'item.module'         // outputs: dist/item.module.min.js
+            }
         }
     }
 };

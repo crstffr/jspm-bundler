@@ -31,15 +31,21 @@ function JSPMBundler(opts) {
         baseURL: ''
     };
 
-    _system.baseURL = path.join(root, opts.baseURL, '/') || root;
+    if (path.isAbsolute(opts.baseURL)) {
+        _system.baseURL = opts.baseURL;
+    } else {
+        _system.baseURL = path.join(root, opts.baseURL, '/') || root;
+    }
+
     _system.config = _getSystemJSConfig();
 
     var _opts = _.defaults(opts || {}, {
-        dest: 'bundles/',
-        file: 'bundles.js',
+        dest: '',
+        file: '',
         bust: false,
         bundles: {},
         builder: {
+            sfx: false,
             minify: false,
             mangle: false,
             sourceMaps: false,
@@ -97,11 +103,16 @@ function JSPMBundler(opts) {
                 if (err) { reject(err); }
                 else { resolve(results); }
             });
-        }).then(function () {
-            return _calcChecksums(completed).then(function (checksums) {
-                _updateBundleManifest(completed, checksums);
+        }).then(function(){
+            if (_opts.bust) {
+                _calcChecksums(completed).then(function (checksums) {
+                    _updateBundleManifest(completed, checksums);
+                    console.log('-- Complete -------------');
+                });
+            } else {
+                _updateBundleManifest(completed);
                 console.log('-- Complete -------------');
-            });
+            }
         });
     };
 
@@ -159,10 +170,10 @@ function JSPMBundler(opts) {
      * @private
      */
     function _getBundleOpts(name) {
-        var opts = _bundles[name];
-        if (opts) {
-            opts.builder = _.defaults(opts.builder, _opts.builder);
-            return opts;
+        var bundleOpts = _bundles[name];
+        if (bundleOpts) {
+            bundleOpts.builder = _.defaults(bundleOpts.builder, _opts.builder);
+            return bundleOpts;
         } else {
             return false;
         }
@@ -177,15 +188,18 @@ function JSPMBundler(opts) {
      * @private
      */
     function _getBundleDest(bundleName, bundleOpts) {
-        var url = path.join(_system.baseURL, opts.dest);
+
+        var url = path.join(_system.baseURL, _opts.dest);
         var min = bundleOpts.builder.minify;
-        var file = bundleName + ((min) ? '.min.js' : '.js');
+        var name = bundleOpts.items[bundleName] || bundleName;
+        var file = name + ((min) ? '.min.js' : '.js');
 
         if (bundleOpts.combine) {
             url = path.join(url, bundleName, file);
         } else {
             url = path.join(url, file);
         }
+
         return url;
     }
 
@@ -287,21 +301,33 @@ function JSPMBundler(opts) {
     function _bundle(bundleName, bundleStr, bundleDest, bundleOpts) {
 
         var builder = new Builder({separateCSS: bundleOpts.builder.separateCSS});
-        var shortPath = _getBundleShortPath(bundleName, bundleOpts);
 
-        mkdirp.sync(path.dirname(bundleDest));
+        // Determine whether we use bundle or buildStatic (sfx option)
+        var sfx = bundleOpts.builder.sfx;
+        var bundler = (sfx) ? builder.buildStatic : builder.bundle;
+
+        var shortPath = _getBundleShortPath(bundleName, bundleOpts);
+        var filename = path.parse(bundleDest).base;
+
+        if (invalidFileRegex.test(filename)) {
+            return Promise.reject(bundleDest + ' is an invalid destination');
+        }
+
+        // Set builder configuration
+
+        builder.config(bundleOpts.builder.config);
 
         return new Promise(function (resolve, reject) {
 
-            var filename = path.parse(bundleDest).base;
+            mkdirp.sync(path.dirname(bundleDest));
 
-            if (invalidFileRegex.test(filename)) {
-                return reject(bundleDest + ' is an invalid destination');
-            }
+            bundler.bind(builder)(bundleStr, bundleDest, bundleOpts.builder).then(function (output) {
 
-            builder.bundle(bundleStr, bundleDest, bundleOpts.builder).then(function (output) {
-
-                console.log(' ✔ Bundled:', bundleName);
+                if (sfx) {
+                    console.log(' ✔ Built sfx package:', bundleName, ' -> ', filename);
+                } else {
+                    console.log(' ✔ Bundled:', bundleName, ' -> ', filename);
+                }
 
                 resolve({
                     path: shortPath,
@@ -338,7 +364,6 @@ function JSPMBundler(opts) {
         try {
             data = require(path);
         } catch (e) {
-            console.log('Manifest not found, creating one.');
             data = {};
         }
         return data;
@@ -398,6 +423,10 @@ function JSPMBundler(opts) {
      * @private
      */
     function _writeBundleManifest(manifest) {
+
+        if (!_opts.file) {
+            return Promise.resolve();
+        }
 
         console.log('Writing manifest...');
 

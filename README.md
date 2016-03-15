@@ -7,6 +7,7 @@ and updated independently of the config.js.
 * Bundle/unbundle specific groups
 * Easier management of exclusions (exclude groups or packages)
 * Bust cached bundles using generated file checksums
+* Support for self-extracting bundles (aka static builds)
 
 [![NPM](https://nodei.co/npm/jspm-bundler.png?downloads=true)](https://nodei.co/npm/jspm-bundler/)
 
@@ -33,20 +34,26 @@ var Bundler = require('jspm-bundler');
 
 var bundler = new Bundler({
 
-    baseURL: '',     // must be the same baseURL as SystemJS
+    baseURL: '',                // must be the same baseURL as SystemJS
+                                // paths are relative to your baseURL
+    dest: '',                   // path to folder where bundles are saved
+    file: '',                   // JS file where bundle manifest is written
 
-    // paths are relative to your baseURL.
-    dest: '',       // path to folder where bundles are saved
-    file: '',       // JS file where bundle manifest is written
+    bust: false,                // use file checksums to bust cached bundles
 
-    bust: false,    // use file checksums to bust cached bundles
-
-    builder: {      // global build options passed to jspm.Builder
+    builder: {                  // global build options passed to jspm.Builder
+        sfx: false,             // self-extracting bundle with buildStatic()
         minify: false,
         mangle: false,
         sourceMaps: false,
         separateCSS: false,
-        lowResSourceMaps: true
+        lowResSourceMaps: true,
+        config: {               // config file overrides
+            map: {},
+            meta: {},
+            paths: {}
+            ...
+        }
     },
 
     bundles: {
@@ -54,14 +61,38 @@ var bundler = new Bundler({
             bundle: true,       // whether to bundle this group
             combine: false,     // combine items together via addition
             exclude: [],        // exclude groups or packages via subtraction
-            items: [],          // list of packages or files to bundle,
+
+            // Items can be a simple array of packages and/or application files.
+            // Globs or wildcards are not supported.  Bundles are created by
+            // traversing a dependency graph, so start with an entrypoint.
+            // Do not use file extensions, SystemJS assumes .js extensions.
+
+            items: [
+                'angular',
+                'jquery',
+                'source/app'
+            ],
+
+            // Items can also be an object that specifies entry as key
+            // and a different output filename (no file ext) as value
+
+            items: {
+                'source/app': 'distbundle'
+            }
 
             builder: {          // options passed to jspm.Builder
-                minify: false,  // these override the global options
+                sfx: false,     // these override the global options
+                minify: false,
                 mangle: false,
                 sourceMaps: false,
                 separateCSS: false,
-                lowResSourceMaps: true
+                lowResSourceMaps: true,
+                config: {
+                    map: {},
+                    meta: {},
+                    paths: {}
+                    ...
+                }
             }
         }
     }
@@ -105,4 +136,5 @@ bundler.unbundle(['routes']).then(function(){
 
 [Example Bundle Config](https://github.com/crstffr/jspm-bundler/blob/master/example/bundle.config.js)
 
+[Example SFX Build Config](https://github.com/crstffr/jspm-bundler/blob/master/example/build.sfx.config.js)
 
