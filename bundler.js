@@ -105,13 +105,15 @@ function JSPMBundler(opts) {
             });
         }).then(function(){
             if (_opts.bust) {
-                _calcChecksums(completed).then(function (checksums) {
-                    _updateBundleManifest(completed, checksums);
-                    console.log('-- Complete -------------');
+                return _calcChecksums(completed).then(function (checksums) {
+                    _updateBundleManifest(completed, checksums).then(function(){
+                        console.log('-- Complete -------------');
+                    });
                 });
             } else {
-                _updateBundleManifest(completed);
-                console.log('-- Complete -------------');
+                return _updateBundleManifest(completed).then(function(){
+                    console.log('-- Complete -------------');
+                });
             }
         });
     };

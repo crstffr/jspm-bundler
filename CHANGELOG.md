@@ -1,3 +1,7 @@
+## v0.1.7
+
+* Fixed bug with bundle() promise resolving too soon [#9](https://github.com/crstffr/jspm-bundler/issues/9)
+
 ## v0.1.6
 
 * Option to specify output filename for each item separately. [#7](https://github.com/crstffr/jspm-bundler/issues/7)
