@@ -1,3 +1,8 @@
+## v0.1.9
+
+* Reverted back, issue with JSPM v0.16.34
+* Pinned npm dependencies.
+
 ## v0.1.8
 
 * Updated to JSPM v0.16.34

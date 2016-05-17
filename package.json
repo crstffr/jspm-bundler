@@ -1,6 +1,6 @@
 {
   "name": "jspm-bundler",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "more configurable bundler for jspm",
   "main": "bundler.js",
   "scripts": {
@@ -21,10 +21,10 @@
   },
   "homepage": "https://github.com/crstffr/jspm-bundler#readme",
   "dependencies": {
-    "async": "^1.5.2",
-    "checksum": "^0.1.1",
-    "jspm": "^0.16.34",
-    "lodash": "^4.1.0",
-    "mkdirp": "^0.5.1"
+    "async": "1.5.2",
+    "checksum": "0.1.1",
+    "jspm": "0.16.31",
+    "lodash": "4.12.0",
+    "mkdirp": "0.5.1"
   }
 }
