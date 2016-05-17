@@ -13,7 +13,6 @@
     System.normalize = function (name, pName, pAddress) {
         return systemNormalize.call(this, name, pName, pAddress).then(function (address) {
             var chksum = chksums[name];
-            address = address.replace(/\.gz\.js$/, '.gz');
             if (chksums[name]) { bust[address] = chksum; }
             return address;
         });

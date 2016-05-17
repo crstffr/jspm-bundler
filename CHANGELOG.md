@@ -1,3 +1,7 @@
+## v0.1.8
+
+* Updated to JSPM v0.16.34
+
 ## v0.1.7
 
 * Fixed bug with bundle() promise resolving too soon [#9](https://github.com/crstffr/jspm-bundler/issues/9)
