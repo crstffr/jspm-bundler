@@ -520,6 +520,7 @@ function JSPMBundler(opts) {
      */
     function _getSystemJSConfig() {
         var jspm = require('jspm');
+        jspm.setPackagePath(_system.baseURL);
         var file = path.join(_system.baseURL, 'config.js');
         require(file);
         return System.config;

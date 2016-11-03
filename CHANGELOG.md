@@ -1,3 +1,7 @@
+## v0.1.10
+
+* Added ```jspm.setPackagePath(_system.baseURL);```
+
 ## v0.1.9
 
 * Reverted back, issue with JSPM v0.16.34
