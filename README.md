@@ -34,7 +34,9 @@ var Bundler = require('jspm-bundler');
 
 var bundler = new Bundler({
 
-    baseURL: '.',               // Must be the same baseURL as SystemJS.
+    baseURL: '',                // Must be the same baseURL as SystemJS.
+    configFile: '',             // System config (defaults to config.js)
+    packagePath: '',            // Path to package.json (defaults to root)
 
     // Paths are relative to your baseURL.
     dest: 'bundles',            // Path to folder where bundles are saved.

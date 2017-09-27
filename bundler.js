@@ -28,13 +28,17 @@ function JSPMBundler(opts) {
 
     var _system = {
         config: {},
-        baseURL: ''
+        baseURL: opts.baseURL || '',
+        packagePath: opts.packagePath || '',
+        configFile: opts.configFile || 'config.js'
     };
 
-    if (path.isAbsolute(opts.baseURL)) {
-        _system.baseURL = opts.baseURL;
-    } else {
-        _system.baseURL = path.join(root, opts.baseURL, '/') || root;
+    if (!path.isAbsolute(_system.baseURL)) {
+        _system.baseURL = path.join(root, _system.baseURL, '/') || root;
+    }
+
+    if (!path.isAbsolute(_system.packagePath)) {
+        _system.packagePath = path.join(root, _system.packagePath, '/') || root;
     }
 
     _system.config = _getSystemJSConfig();
@@ -520,8 +524,8 @@ function JSPMBundler(opts) {
      */
     function _getSystemJSConfig() {
         var jspm = require('jspm');
-        jspm.setPackagePath(_system.baseURL);
-        var file = path.join(_system.baseURL, 'config.js');
+        jspm.setPackagePath(_system.packagePath);
+        var file = path.join(_system.baseURL, _system.configFile);
         require(file);
         return System.config;
     }

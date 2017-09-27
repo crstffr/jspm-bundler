@@ -1,3 +1,9 @@
+## v0.1.11
+
+* Fixed issue #13
+* Updated all dependencies to current latest
+* Added ```packagePath``` and ```configFile``` options
+
 ## v0.1.10
 
 * Added ```jspm.setPackagePath(_system.baseURL);```
